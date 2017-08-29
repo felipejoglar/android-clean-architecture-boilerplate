@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
+
     defaultConfig {
         applicationId "com.fjoglar.android.boilerplate"
         minSdkVersion 21
@@ -11,20 +12,54 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+    /** A debug keystore which is used to sign an Android app during development needs a
+     * specific alias and password combination as dictated by Google.
+     *
+     * To create a debug keystore, use:
+     *
+     *  $ keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey
+     *           -keypass android -keyalg RSA -keysize 2048 -validity 10000
+     */
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storePassword 'android'
+            storeFile file('../keystore/debug.keystore')
         }
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+    }
+
+}
+
+ext {
+    supportLibVersion = '26.+'
+    constraintLayoutVersion = '1.0.2'
+
+    espressoCoreVersion = '2.2.2'
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support.constraint:constraint-layout:${constraintLayoutVersion}"
+
+    testCompile 'junit:junit:4.12'
+
+    androidTestCompile("com.android.support.test.espresso:espresso-core:${espressoCoreVersion}", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
 }
