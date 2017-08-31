@@ -18,6 +18,8 @@ package com.fjoglar.android.boilerplate;
 
 public interface BasePresenter {
 
-    void start();
+    void subscribe();
+
+    void unsubscribe();
 
 }

@@ -16,44 +16,71 @@
 
 package com.fjoglar.android.boilerplate.main;
 
-import com.fjoglar.android.boilerplate.UseCase;
-import com.fjoglar.android.boilerplate.UseCaseHandler;
-import com.fjoglar.android.boilerplate.data.source.Repository;
+import android.support.annotation.NonNull;
+
+import com.fjoglar.android.boilerplate.DefaultObserver;
+import com.fjoglar.android.boilerplate.data.source.DataSource;
 import com.fjoglar.android.boilerplate.main.domain.GetWelcomeMessage;
+import com.fjoglar.android.boilerplate.util.schedulers.BaseSchedulerProvider;
 
 public class MainPresenter implements MainContract.Presenter {
 
-    private final UseCaseHandler mUseCaseHandler;
-    private MainContract.View mMainView;
+    @NonNull
+    private final DataSource mRepository;
 
-    public MainPresenter(MainContract.View mainView) {
+    @NonNull
+    private final MainContract.View mMainView;
+
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
+    private final GetWelcomeMessage mGetWelcomeMessage;
+
+    public MainPresenter(@NonNull DataSource repository,
+                         @NonNull MainContract.View mainView,
+                         @NonNull BaseSchedulerProvider schedulerProvider) {
+        mRepository = repository;
         mMainView = mainView;
-        mUseCaseHandler = UseCaseHandler.getInstance();
+        mSchedulerProvider = schedulerProvider;
 
         mMainView.setPresenter(this);
+
+        mGetWelcomeMessage = new GetWelcomeMessage(mRepository,
+                                                   mSchedulerProvider.computation(),
+                                                   mSchedulerProvider.ui());
+    }
+
+    @Override
+    public void subscribe() {
+        mMainView.showLoading();
+        getWelcomeMessage();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mGetWelcomeMessage.dispose();
     }
 
     @Override
     public void getWelcomeMessage() {
-
-        GetWelcomeMessage getWelcomeMessage = new GetWelcomeMessage(Repository.getInstance());
-
-        mUseCaseHandler.execute(getWelcomeMessage, new GetWelcomeMessage.RequestValues(),
-                new UseCase.UseCaseCallback<GetWelcomeMessage.ResponseValue>() {
-                    @Override
-                    public void onSuccess(GetWelcomeMessage.ResponseValue response) {
-                        mMainView.showWelcomeMessage(response.getResponseMessage());
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        mMainView.showWelcomeMessage(error.getMessage());
-                    }
-                });
+        mGetWelcomeMessage.execute(new WelcomeMessageObserver());
     }
 
-    @Override
-    public void start() {
-        getWelcomeMessage();
+    private final class WelcomeMessageObserver extends DefaultObserver<String> {
+
+        @Override
+        public void onNext(String welcomeMessage) {
+            mMainView.showWelcomeMessage(welcomeMessage);
+        }
+
+        @Override
+        public void onComplete() {
+            mMainView.hideLoading();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+        }
     }
 }

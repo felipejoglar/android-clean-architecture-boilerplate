@@ -16,16 +16,27 @@
 
 package com.fjoglar.android.boilerplate;
 
+import io.reactivex.observers.DisposableObserver;
+
 /**
- * Interface for schedulers, see {@link UseCaseThreadPoolScheduler}.
+ * Default {@link DisposableObserver} base class to be used whenever you want default
+ * error handling.
  */
-public interface UseCaseScheduler {
 
-    void execute(Runnable runnable);
+public class DefaultObserver<T> extends DisposableObserver<T> {
 
-    <V extends UseCase.ResponseValue> void notifyResponse(final V response,
-                                                          final UseCase.UseCaseCallback<V> useCaseCallback);
+    @Override
+    public void onNext(T t) {
+        // no-op by default.
+    }
 
-    <V extends UseCase.ResponseValue> void onError(final Error error,
-                                                   final UseCase.UseCaseCallback<V> useCaseCallback);
+    @Override
+    public void onComplete() {
+        // no-op by default.
+    }
+
+    @Override
+    public void onError(Throwable exception) {
+        // no-op by default.
+    }
 }

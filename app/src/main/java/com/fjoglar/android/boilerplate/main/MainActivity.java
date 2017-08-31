@@ -17,16 +17,24 @@
 package com.fjoglar.android.boilerplate.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.fjoglar.android.boilerplate.R;
+import com.fjoglar.android.boilerplate.data.source.Repository;
+import com.fjoglar.android.boilerplate.data.source.local.LocalDataSource;
+import com.fjoglar.android.boilerplate.data.source.remote.RemoteDataSource;
+import com.fjoglar.android.boilerplate.util.schedulers.SchedulerProvider;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
 
     private MainContract.Presenter mMainPresenter;
 
     private TextView mTxtWelcomeMessage;
+    private ProgressBar mProgressLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +42,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setContentView(R.layout.activity_main);
 
         mTxtWelcomeMessage = (TextView) findViewById(R.id.txt_welcome_message);
+        mProgressLoading = (ProgressBar) findViewById(R.id.progress_loading);
 
-        mMainPresenter = new MainPresenter(this);
+        mMainPresenter = new MainPresenter(
+                Repository.getInstance(RemoteDataSource.getInstance(),
+                        LocalDataSource.getInstance()),
+                this,
+                SchedulerProvider.getInstance());
     }
 
     @Override
@@ -46,12 +59,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     protected void onResume() {
         super.onResume();
-        mMainPresenter.start();
+        mMainPresenter.subscribe();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        mMainPresenter.unsubscribe();
     }
 
     @Override
@@ -65,12 +79,22 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void setPresenter(MainContract.Presenter presenter) {
+    public void setPresenter(@NonNull MainContract.Presenter presenter) {
         mMainPresenter = presenter;
     }
 
     @Override
     public void showWelcomeMessage(String message) {
         mTxtWelcomeMessage.setText(message);
+    }
+
+    @Override
+    public void showLoading() {
+        mProgressLoading.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        mProgressLoading.setVisibility(View.GONE);
     }
 }

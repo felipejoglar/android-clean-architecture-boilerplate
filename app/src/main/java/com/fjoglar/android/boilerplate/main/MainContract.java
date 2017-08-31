@@ -25,6 +25,9 @@ public interface MainContract {
 
         void showWelcomeMessage(String message);
 
+        void showLoading();
+
+        void hideLoading();
     }
 
     interface Presenter extends BasePresenter {

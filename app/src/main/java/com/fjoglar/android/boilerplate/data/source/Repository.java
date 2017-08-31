@@ -16,34 +16,63 @@
 
 package com.fjoglar.android.boilerplate.data.source;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.util.Random;
+
+import io.reactivex.Observable;
 
 public class Repository implements DataSource {
 
-    private static volatile DataSource INSTANCE;
+    @Nullable
+    private static volatile Repository INSTANCE = null;
 
-    private Repository() {
-        // private constructor
+    @NonNull
+    private final DataSource mRemoteDataSource;
+
+    @NonNull
+    private final DataSource mLocalDataSource;
+
+    // Prevent direct instantiation.
+    private Repository(@NonNull DataSource remoteDataSource,
+                       @NonNull DataSource localDataSource) {
+        mRemoteDataSource = remoteDataSource;
+        mLocalDataSource = localDataSource;
     }
 
-    public static DataSource getInstance() {
+    /**
+     * Returns the single instance of this class, creating it if necessary.
+     *
+     * @param remoteDataSource the backend data source
+     * @param localDataSource  the device storage data source
+     * @return the {@link Repository} instance
+     */
+    public static Repository getInstance(@NonNull DataSource remoteDataSource,
+                                         @NonNull DataSource localDataSource) {
         if (INSTANCE == null) {
-            INSTANCE = new Repository();
+            INSTANCE = new Repository(remoteDataSource, localDataSource);
         }
         return INSTANCE;
     }
 
+    /**
+     * Used to force {@link #getInstance(DataSource, DataSource)} to create a new instance
+     * next time it's called.
+     */
+    public static void destroyInstance() {
+        INSTANCE = null;
+    }
+
     @Override
-    public void getWelcomeMessage(GetWelcomeMessageCallback callback) {
+    public Observable<String> getWelcomeMessage() {
 
-        final float ERROR_RATE = 0.15f;
-        final String WELCOME_MESSAGE = "Hello World!";
-        final String ERROR_MESSAGE = "Oh no! Goodbye World...";
+        final float REMOTE_ACCESS_RATE = 0.30f;
 
-        if (new Random().nextFloat() > ERROR_RATE) {
-            callback.onWelcomeMessageLoaded(WELCOME_MESSAGE);
+        if (new Random().nextFloat() > REMOTE_ACCESS_RATE) {
+            return mLocalDataSource.getWelcomeMessage();
         } else {
-            callback.onDataNotAvailable(ERROR_MESSAGE);
+            return mRemoteDataSource.getWelcomeMessage();
         }
     }
 }

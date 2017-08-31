@@ -16,55 +16,61 @@
 
 package com.fjoglar.android.boilerplate;
 
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+
 /**
  * Use cases are the entry points to the domain layer.
  *
- * @param <Q> the request type
- * @param <P> the response type
+ * @param <T> the request type
  */
-public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> {
+public abstract class UseCase<T> {
 
-    private Q mRequestValues;
+    private final Scheduler mThreadExecutor;
+    private final Scheduler mPostExecutionThread;
+    private final CompositeDisposable mDisposables;
 
-    private UseCaseCallback<P> mUseCaseCallback;
-
-    public Q getRequestValues() {
-        return mRequestValues;
-    }
-
-    public void setRequestValues(Q requestValues) {
-        mRequestValues = requestValues;
-    }
-
-    public UseCaseCallback<P> getUseCaseCallback() {
-        return mUseCaseCallback;
-    }
-
-    public void setUseCaseCallback(UseCaseCallback<P> useCaseCallback) {
-        mUseCaseCallback = useCaseCallback;
-    }
-
-    void run() {
-        executeUseCase(mRequestValues);
-    }
-
-    protected abstract void executeUseCase(Q requestValues);
-
-    /**
-     * Data passed to a request.
-     */
-    public interface RequestValues {
+    public UseCase(Scheduler threadExecutor, Scheduler postExecutionThread) {
+        mThreadExecutor = threadExecutor;
+        mPostExecutionThread = postExecutionThread;
+        mDisposables = new CompositeDisposable();
     }
 
     /**
-     * Data received from a request.
+     * Builds an {@link Observable} which will be used when executing the current {@link UseCase}.
      */
-    public interface ResponseValue {
+    public abstract Observable<T> buildUseCaseObservable();
+
+    /**
+     * Executes the current use case.
+     *
+     * @param observer {@link DisposableObserver} which will be listening to the observable build
+     *                 by {@link #buildUseCaseObservable()} ()} method.
+     */
+    public void execute(DisposableObserver<T> observer) {
+
+        final Observable<T> observable = this.buildUseCaseObservable()
+                                             .subscribeOn(mThreadExecutor)
+                                             .observeOn(mPostExecutionThread);
+        addDisposable(observable.subscribeWith(observer));
     }
 
-    public interface UseCaseCallback<R> {
-        void onSuccess(R response);
+    /**
+     * Dispose from current {@link CompositeDisposable}.
+     */
+    public void dispose() {
+        if (!mDisposables.isDisposed()) {
+            mDisposables.dispose();
+        }
+    }
 
-        void onError(Error error);
+    /**
+     * Dispose from current {@link CompositeDisposable}.
+     */
+    private void addDisposable(Disposable disposable) {
+        mDisposables.add(disposable);
     }
 }

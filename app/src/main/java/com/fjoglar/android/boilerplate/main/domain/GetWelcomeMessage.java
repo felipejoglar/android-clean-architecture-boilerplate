@@ -19,45 +19,26 @@ package com.fjoglar.android.boilerplate.main.domain;
 import com.fjoglar.android.boilerplate.UseCase;
 import com.fjoglar.android.boilerplate.data.source.DataSource;
 
-public class GetWelcomeMessage extends UseCase<GetWelcomeMessage.RequestValues, GetWelcomeMessage.ResponseValue> {
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
-    private final DataSource mDataSource;
+/**
+ * This class is an implementation of {@link UseCase} that represents a use case for
+ * retrieving the welcome message.
+ */
+public class GetWelcomeMessage extends UseCase<String> {
 
-    public GetWelcomeMessage(DataSource dataSource) {
-        this.mDataSource = dataSource;
+    private final DataSource mRepository;
+
+    public GetWelcomeMessage(DataSource repository,
+                             Scheduler threadExecutor,
+                             Scheduler postExecutionThread) {
+        super(threadExecutor, postExecutionThread);
+        mRepository = repository;
     }
 
     @Override
-    protected void executeUseCase(RequestValues requestValues) {
-        mDataSource.getWelcomeMessage(
-                new DataSource.GetWelcomeMessageCallback() {
-                    @Override
-                    public void onWelcomeMessageLoaded(String welcomeMessage) {
-                        ResponseValue responseValue = new ResponseValue(welcomeMessage);
-                        getUseCaseCallback().onSuccess(responseValue);
-                    }
-
-                    @Override
-                    public void onDataNotAvailable(String errorMessage) {
-                        Error dataNotAvailableError = new Error(errorMessage);
-                        getUseCaseCallback().onError(dataNotAvailableError);
-                    }
-                });
-    }
-
-    public static final class RequestValues implements UseCase.RequestValues {
-    }
-
-    public static final class ResponseValue implements UseCase.ResponseValue {
-
-        private String mResponseMessage;
-
-        public ResponseValue(String responseMessage) {
-            mResponseMessage = responseMessage;
-        }
-
-        public String getResponseMessage() {
-            return mResponseMessage;
-        }
+    public Observable<String> buildUseCaseObservable() {
+        return mRepository.getWelcomeMessage();
     }
 }

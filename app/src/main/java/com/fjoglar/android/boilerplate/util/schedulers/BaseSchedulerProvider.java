@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.fjoglar.android.boilerplate.data.source;
+package com.fjoglar.android.boilerplate.util.schedulers;
 
-import io.reactivex.Observable;
+import android.support.annotation.NonNull;
 
-public interface DataSource {
+import io.reactivex.Scheduler;
 
-    Observable<String> getWelcomeMessage();
+/**
+ * Allow providing different types of {@link Scheduler}s.
+ */
+public interface BaseSchedulerProvider {
+
+    @NonNull
+    Scheduler computation();
+
+    @NonNull
+    Scheduler io();
+
+    @NonNull
+    Scheduler ui();
 }
