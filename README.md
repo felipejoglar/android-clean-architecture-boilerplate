@@ -1,6 +1,6 @@
 # Android Clean Architecture Boilerplate
 
-[![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](https://github.com/fjoglar/android-clean-architecture-boilerplate/blob/master/LICENSE)
+[![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](https://github.com/fjoglar/android-clean-architecture-boilerplate/blob/develop/LICENSE.txt)
 [![fjoglar twitter](https://img.shields.io/badge/twitter-@felipejoglar-blue.svg)](http://twitter.com/felipejoglar)
 [![Platform Android](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 
