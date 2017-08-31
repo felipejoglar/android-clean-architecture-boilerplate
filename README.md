@@ -16,6 +16,7 @@ This is intended to be a base project to be used as a base when starting a new p
 
 ## Requirements
 
+* JDK 1.8
 * [Android SDK](https://developer.android.com/studio/index.html)
 * Android O ([API 26](https://developer.android.com/preview/api-overview.html))
 * Latest Android SDK Tools and build tools.
