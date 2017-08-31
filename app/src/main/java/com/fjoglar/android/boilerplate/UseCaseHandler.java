@@ -29,13 +29,6 @@ public class UseCaseHandler {
         mUseCaseScheduler = useCaseScheduler;
     }
 
-    public static UseCaseHandler getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler());
-        }
-        return INSTANCE;
-    }
-
     public <T extends UseCase.RequestValues, R extends UseCase.ResponseValue> void execute(
             final UseCase<T, R> useCase, T values, UseCase.UseCaseCallback<R> callback) {
 
@@ -55,9 +48,9 @@ public class UseCaseHandler {
         mUseCaseScheduler.notifyResponse(response, useCaseCallback);
     }
 
-    private <V extends UseCase.ResponseValue> void notifyError(final V response,
+    private <V extends UseCase.ResponseValue> void notifyError(final Error error,
                                                                final UseCase.UseCaseCallback<V> useCaseCallback) {
-        mUseCaseScheduler.onError(response, useCaseCallback);
+        mUseCaseScheduler.onError(error, useCaseCallback);
     }
 
     private static final class UiCallbackWrapper<V extends UseCase.ResponseValue> implements
@@ -77,8 +70,15 @@ public class UseCaseHandler {
         }
 
         @Override
-        public void onError(V response) {
-            mUseCaseHandler.notifyError(response, mCallback);
+        public void onError(Error error) {
+            mUseCaseHandler.notifyError(error, mCallback);
         }
+    }
+
+    public static UseCaseHandler getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new UseCaseHandler(new UseCaseThreadPoolScheduler());
+        }
+        return INSTANCE;
     }
 }

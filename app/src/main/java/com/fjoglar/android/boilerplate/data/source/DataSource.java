@@ -18,12 +18,12 @@ package com.fjoglar.android.boilerplate.data.source;
 
 public interface DataSource {
 
-    void getWelcomeMessage(GetWelcomeMessageCallback callback);
-
     interface GetWelcomeMessageCallback {
 
         void onWelcomeMessageLoaded(String welcomeMessage);
 
         void onDataNotAvailable(String errorMessage);
     }
+
+    void getWelcomeMessage(GetWelcomeMessageCallback callback);
 }

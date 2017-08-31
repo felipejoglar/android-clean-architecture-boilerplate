@@ -46,8 +46,8 @@ public class MainPresenter implements MainContract.Presenter {
                     }
 
                     @Override
-                    public void onError(GetWelcomeMessage.ResponseValue response) {
-                        mMainView.showWelcomeMessage(response.getResponseMessage());
+                    public void onError(Error error) {
+                        mMainView.showWelcomeMessage(error.getMessage());
                     }
                 });
     }

@@ -39,8 +39,8 @@ public class GetWelcomeMessage extends UseCase<GetWelcomeMessage.RequestValues, 
 
                     @Override
                     public void onDataNotAvailable(String errorMessage) {
-                        ResponseValue responseValue = new ResponseValue(errorMessage);
-                        getUseCaseCallback().onError(responseValue);
+                        Error dataNotAvailableError = new Error(errorMessage);
+                        getUseCaseCallback().onError(dataNotAvailableError);
                     }
                 });
     }

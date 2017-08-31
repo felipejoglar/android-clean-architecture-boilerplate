@@ -34,6 +34,7 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
     public static final int POOL_SIZE = 2;
     public static final int MAX_POOL_SIZE = 4;
     public static final int TIMEOUT = 30;
+
     private final Handler mHandler = new Handler();
     ThreadPoolExecutor mThreadPoolExecutor;
 
@@ -59,12 +60,12 @@ public class UseCaseThreadPoolScheduler implements UseCaseScheduler {
     }
 
     @Override
-    public <V extends UseCase.ResponseValue> void onError(final V response,
+    public <V extends UseCase.ResponseValue> void onError(final Error error,
                                                           final UseCase.UseCaseCallback<V> useCaseCallback) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                useCaseCallback.onError(response);
+                useCaseCallback.onError(error);
             }
         });
     }
