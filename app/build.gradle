@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.1'
 
     defaultConfig {
         applicationId "com.fjoglar.android.boilerplate"
@@ -12,10 +12,6 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        // Needed for Java 1.8 to work properly
-        jackOptions {
-            enabled true
-        }
     }
 
     /** A debug keystore which is used to sign an Android app during development needs a
@@ -65,19 +61,19 @@ ext {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     // Android Framework Libraries
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile "com.android.support.constraint:constraint-layout:${constraintLayoutVersion}"
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support.constraint:constraint-layout:${constraintLayoutVersion}"
 
     // Reactive Libraries
-    compile "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}"
-    compile "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 
     // Testing Libraries
-    testCompile "junit:junit:${jUnitVersion}"
-    androidTestCompile("com.android.support.test.espresso:espresso-core:${espressoCoreVersion}", {
+    testImplementation "junit:junit:${jUnitVersion}"
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:${espressoCoreVersion}", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
